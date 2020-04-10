@@ -71,8 +71,87 @@
 
 - 터미널에서 'pip install requests' 명령어로 requests 설치
 
+#### Tip
+> requests 설치시 본인 같은 경우, 기존에 requests가 python2에도 설치되어 있고, 가상환경에도 설치되어 있음
+
+> 추후에 python3를 설치하고 requests install 하려하니 (path는 기존의 python2에서 변경하여 python3로 잡혀있음) 이미 설치되어 있다고 함
+>> 그러나 막상 import 하면 없는 module 이라고 함
+
+> 이처럼 환경이 꼬여서 인식이 안될때는, 패키지 설치가 아직 되지 않은 그 환경에서 해당 명령어 입력
+>> python -m pip install '패키지' (or python3 -m pip install requests)
+
+#### 추가
+- For centos: yum install python-requests For Ubuntu: apt-get install python-requests
+
+- If you manually want to add a library to a windows machine, you can download the compressed library, uncompress it, and then place it into the Lib\site-packages folder of your python path. (For example: C:\Python27\Lib\site-packages)
+
+---
+
 ## API를 통해 데이터 요청
 > Spotify의 Search API를 통해 가수,곡 등의 정보들에 대해 검색을 해볼것임
 
 ### Search API
 - [Spotify Search API](https://developer.spotify.com/documentation/web-api/reference/search/search/)에 접속하면 (Spotify의 Web API의 Reference에 들어가면 있음), Search API에 대한 기본 설명이 있음
+
+  ![ss](DE_img/screenshot84.png)
+  ![ss](DE_img/screenshot85.png)
+  - 검색에 필요한 Parameter 들에 대한 설명
+
+- Client Credentials Flow를 보면,
+
+  ![ss](DE_img/screenshot86.png)
+  - access token 을 받기위해 전해줘야하는(request) 값들에 대한 정보가 있음 
+
+### Script 작성
+- 미리 생성해둔 'spotify_api.py' 파일에 파이썬 스크립트 작성
+  ```python
+
+  import sys
+  import requests
+  import base64  # 나의 client id 와 secret key 를 base64 형태로 인코딩해주는 패키지
+  import json
+  import logging  # 에러/로그를 관리
+
+  client_id = '본인의 클라이언트 아이디'
+  client_secret =  '시크릿 아이디'
+
+  def main():
+
+      # AccessToken 을 받아오기 위한 endpoint
+      endpoint = "https://accounts.spotify.com/api/token"
+      # base64로 클라이언트 id, secret을 인코딩
+      encoded = base64.b64encode("{}:{}".format(client_id, client_secret).encode('utf-8').decode('ascii'))
+
+      # 헤더 안에 Authorization에 대한 정보 넣어주기
+      headers = {
+          "Authorization": "Basic {}".format(encoded)
+      }
+
+      # grant type
+      payload = {
+          "grant_type": "client_credentials"
+      }
+
+      # Requests 패키지의 POST method 사용하여 요청
+      r = requests.post(endpoint, data = payload, headers=headers)
+
+      # # 중간까지 코드가 잘 작동하는지 확인하기 위해 넣어주는 코드
+      # # 0 이면(리턴값이 없으면) 에러없이 잘 되는것, 여기서 작업 끝냄
+      # sys.exit(0)
+
+      # 에러/정상 작동 상황 출력
+      print(r.status_code)
+      # r 안에 들어 있는 내용 출력 (AccessToken)
+      print(r.text)
+
+      # 
+      access_token = json.loads(r.text)['access_token']
+
+      headers = {
+          "Authorization": "Bearer {}".format(access_token)
+      }
+
+      
+  ```
+
+  ![ss](DE_img/screenshot87.png)
