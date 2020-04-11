@@ -52,6 +52,7 @@
       main()
 
   ```
+---
 
 ## Python Requests 패키지
 > API 사용에 필요한 python 라이브러리인 Requests 패키지에 대해 알아보겠음
@@ -143,15 +144,87 @@
       print(r.status_code)
       # r 안에 들어 있는 내용 출력 (AccessToken)
       print(r.text)
+      # r.text의 타입은 string 타입임 --> Dictionary 형태로 변환필요
+      print(type(r.text))
 
-      # 
+      # 위에서 가져온 r.text 안의 내용을 딕셔너리형태로 변환 후, access_token의 값을 가져와서 저장
       access_token = json.loads(r.text)['access_token']
-
+        
+      # API를 불러오기 위한 headers 내부에 access_token 넣어주기
       headers = {
           "Authorization": "Bearer {}".format(access_token)
       }
-
       
   ```
-
   ![ss](DE_img/screenshot87.png)
+  - 200이 출력되면 정상작동 중 이라는 사실
+  - access token과 token의 정보가 제대로 출력됨 
+
+- 해당 access_token 은 3600초안에 소멸됨, 
+- 혹시나 access_token이 소멸되는것을 대비하여 지속적으로 요청해야 할 수 있음
+- main 함수가 아닌, 새로운 함수를 더 만들어 따로 관리하게 함
+- 기존의 main에서 만든 함수 내용을 get_headers 라는 새로운 함수안에 넣어줌
+
+  ```python
+  def get_headers(clinet_id, client_secret):
+    
+    endpoint = "https://accounts.spotify.com/api/token"
+    encoded = base64.b64encode("{}:{}".format(client_id, client_secret).encode('utf-8')).decode('ascii')
+
+    headers = {
+        "Authorization": "Basic {}".format(encoded)
+    }
+
+    payload = {
+        "grant_type": "client_credentials"
+    }
+
+    r = requests.post(endpoint, data = payload, headers=headers)
+
+    # sys.exit(0)
+
+    access_token = json.loads(r.text)['access_token']
+    sys.exit(0)
+
+    # API를 불러오기 위한 headers 내부에 access_token 넣어주기
+    headers = {
+        "Authorization": "Bearer {}".format(access_token)
+    }
+    
+    return headers 
+
+  ```
+
+- main 에서는 get_headers로 headers의 정보만 가져오면 됨
+  ```python
+    def main():
+
+      headers = get_headers(client_id, client_secret)
+      print(headers)
+  ```
+
+  ![ss](DE_img/screenshot88.png)
+  - headers에 잘 저장됨
+
+- headers 부분이 끝나면 body param도 전해줘야함
+  ```python
+      # Spotify Search API
+    params = {
+        "q": "BTS",
+        "type": "artist",
+        "limit": "5"   # 너무 많이 가져올때를 대비해 5개만 가져오도록 제한
+    }
+    
+    # search API의 엔드포인트에 get 메쏘드로 정보 가져옴
+    r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
+
+    # 200으로 뜨면 정상작동
+    print(r.status_code)
+    # 가져온 내용 확인
+    print(r.text)
+    sys.exit(0)
+  ```
+
+  ![ss](DE_img/screenshot89.png)
+  - BTS의 정보를 가져왔음!
+

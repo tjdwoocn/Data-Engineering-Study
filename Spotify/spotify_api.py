@@ -9,6 +9,18 @@ client_secret = "ef7ee3b5900c40048bc142e88f112562"
 
 def main():
 
+    headers = get_headers(client_id, client_secret)
+
+    # Spotify Search API
+    params = {
+        "q": "BTS",
+        "type": "artist",
+    }
+    
+    r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
+
+def get_headers(clinet_id, client_secret):
+    
     endpoint = "https://accounts.spotify.com/api/token"
     encoded = base64.b64encode("{}:{}".format(client_id, client_secret).encode('utf-8')).decode('ascii')
 
@@ -22,17 +34,16 @@ def main():
 
     r = requests.post(endpoint, data = payload, headers=headers)
 
-    print(r.status_code)
-    print(r.text)
-
-    sys.exit(0)
+    # sys.exit(0)
 
     access_token = json.loads(r.text)['access_token']
 
+    # API를 불러오기 위한 headers 내부에 access_token 넣어주기
     headers = {
         "Authorization": "Bearer {}".format(access_token)
     }
-
     
+    return headers 
+
 if __name__ == '__main__':
     main()
