@@ -1,4 +1,4 @@
-# Data-Engineering 06 - Spotify API
+# Data-Engineering 06 - Spotify API(App 생성 및 토큰발급, API Requests)
 
 ## Spotify App 생성 및 토큰 발급
 > Spotify의 Web API를 사용하기 위한 토큰 발급이 필요

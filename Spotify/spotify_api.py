@@ -15,9 +15,33 @@ def main():
     params = {
         "q": "BTS",
         "type": "artist",
+        "limit": "5", 
     }
+
+    # try:
+    #     r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
+    # except:
+    #     logging.error(r.text)
+    #     sys.exit(1)
     
-    r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
+    if r.status_code != 200:
+        logging.error(r.text)
+
+        if r.status_code == 429:
+
+            retry_after = json.loads(r.headers)['Retry-After']
+            time.sleep(int(retry_after))
+
+            r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
+            
+        elif r.status_code == 401:
+
+            headers = get_headers(client_id, client_secret)
+            r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
+
+        else:
+            sys.exit(1)
+
 
 def get_headers(clinet_id, client_secret):
     
@@ -33,8 +57,6 @@ def get_headers(clinet_id, client_secret):
     }
 
     r = requests.post(endpoint, data = payload, headers=headers)
-
-    # sys.exit(0)
 
     access_token = json.loads(r.text)['access_token']
 
