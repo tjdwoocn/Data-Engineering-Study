@@ -105,7 +105,49 @@
     ![ss](DE_img/screenshot94.png)
 
 - BTS id 값 카피 후 사용을 위한 코드 작성
-- 
 
+    ```python
+        # BTS IT를 넣어서 앨범정보 가져오기
+        r = requests.get("https://api.spotify.com/v1/artists/3Nrfpe0tUJi4K4DXYWgMUX/albums", headers=headers)
+    
+        raw = json.loads(r.text)
 
+        total = raw['total']
+        offset = raw['offset']
+        limit = raw['limit']
+        next = raw['next']
 
+        # 앨범정보 출력
+        print(total) # 89개
+        print(offset) # 0번째부터
+        print(limit) # 디폴트 20
+        print(next) # offset이 20부터 시작함(디폴트로 20까지 했기떄문에)
+        sys.exit(0)
+    ```
+    ![ss](DE_img/screenshot95.png)
+    - 실행값
+
+- 엘범정보 가져오기
+    ```python
+        # 최대 100개만 뽑아 오겠다
+        count = 0
+        # 100보다 작고, next가 있을때까지만
+        while count < 100 and next:
+            # next값을 넣어줘서 다음 페이지 불러오기
+            r = requests.get(raw['next'], headers=headers)
+            raw = json.loads(r.text)
+            # 불러온 next의 next값을 새로운 next값으로 넣어주기
+            next = raw['next']
+            print(next)
+             
+            # extend, items 계속 추가해주기
+            albums.extend(raw['items'])
+            count = len(albums)
+
+        print(len(albums))
+    ```
+
+    ![ss](DE_img/screenshot96.png)
+    - next가 3번 출력되고
+    - 더이상 가져올 값이 없을때 None값 출력됨
+  

@@ -18,7 +18,7 @@ def main():
         "limit": "5", 
     }
 
-    r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
+    # r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
 
     # try:
     #     r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
@@ -26,26 +26,26 @@ def main():
     #     logging.error(r.text)
     #     sys.exit(1)
     
-    if r.status_code != 200:
-        logging.error(r.text)
+    # if r.status_code != 200:
+    #     logging.error(r.text)
 
-        if r.status_code == 429:
+    #     if r.status_code == 429:
 
-            retry_after = json.loads(r.headers)['Retry-After']
-            time.sleep(int(retry_after))
+    #         retry_after = json.loads(r.headers)['Retry-After']
+    #         time.sleep(int(retry_after))
 
-            r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
+    #         r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
             
-        elif r.status_code == 401:
+    #     elif r.status_code == 401:
 
-            headers = get_headers(client_id, client_secret)
-            r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
+    #         headers = get_headers(client_id, client_secret)
+    #         r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
 
-        else:
-            sys.exit(1)
+    #     else:
+    #         sys.exit(1)
 
     # Get BTS' Albums, BTS ID 값 넣어줘서 찾기
-    r = requests.get("https://api.spotify.com/v1/artists/3Nrfpe0tUJi4K4DXYWgMUX", headers=headers)
+    r = requests.get("https://api.spotify.com/v1/artists/3Nrfpe0tUJi4K4DXYWgMUX/albums", headers=headers)
     
     raw = json.loads(r.text)
 
@@ -55,8 +55,21 @@ def main():
     next = raw['next']
 
     albums = []
-    print(len(raw['items']))
-    
+    albums.extend(raw['items'])
+
+    # 최대 100개만 뽑아 오겠다
+    count = 0
+    while count < 100 and next:
+        r = requests.get(raw['next'], headers=headers)
+        raw = json.loads(r.text)
+        next = raw['next']
+        print(next)
+
+        albums.extend(raw['items'])
+        count = len(albums)
+
+    print(len(albums))
+
 
 
 
