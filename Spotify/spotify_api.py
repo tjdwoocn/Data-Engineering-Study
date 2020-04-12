@@ -18,6 +18,8 @@ def main():
         "limit": "5", 
     }
 
+    r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
+
     # try:
     #     r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
     # except:
@@ -41,6 +43,21 @@ def main():
 
         else:
             sys.exit(1)
+
+    # Get BTS' Albums, BTS ID 값 넣어줘서 찾기
+    r = requests.get("https://api.spotify.com/v1/artists/3Nrfpe0tUJi4K4DXYWgMUX", headers=headers)
+    
+    raw = json.loads(r.text)
+
+    total = raw['total']
+    offset = raw['offset']
+    limit = raw['limit']
+    next = raw['next']
+
+    albums = []
+    print(len(raw['items']))
+    
+
 
 
 def get_headers(clinet_id, client_secret):

@@ -88,4 +88,24 @@
 ---
 
 ## 페이지네이션 핸들링
+> 한번에 받아올 수 있는 데이터의 양을 조절하기 위해(서버 과부하를 줄이기 위해) 스포티파이 자체적으로 옵션을 만들어 둠, 다른 API들도 대부분 이런 기능 있음.
+
+### Paging Object
+- 'get an Artist's Albums' api 내용 중 제일 아래에 위치
+    ![ss](DE_img/screenshot92.png)
+    - 해당 옵션들을 API 사용중에 추가가능
+    - limit의 deafult는 20, minimum은 1로 되어 있음
+    - offset은 0으로, 첫번째 앨범부터 검색하는것으로 default
+
+### BTS 엘범정보 검색
+- 기존의 코드를 실행시키면 BTS에 대한 정보 나옴
+- External URL로 확인해보기
+
+    ![ss](DE_img/screenshot93.png)
+    ![ss](DE_img/screenshot94.png)
+
+- BTS id 값 카피 후 사용을 위한 코드 작성
+- 
+
+
 
