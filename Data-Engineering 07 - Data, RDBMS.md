@@ -1,4 +1,4 @@
-# Data-Engineering 07 - Data, RDBMS
+# Data-Engineering 07 - Data, RDBMS, ERD
 
 ## Data Types
 > Schema에서 저장되는/쓰이는 각 데이터별로 타입의 종류가 다르고, 타입별로 사용방법 또한 다르다
@@ -60,3 +60,47 @@
 
 ---
 
+## ERD (Entity Relationship Diagram)
+> 데이터 모델링 설계 과정에서 사용하는 모델로 약속된 기호를 이용하여 데이터베이스의 구조를 쉽게 이해
+
+### ERD의 기본 요소들
+- Entities, Attributes, Relationships
+  
+    ![ss](DE_img/screenshot129.png)
+
+- Patients and Physicians
+  
+    ![ss](DE_img/screenshot130.png)
+    - 환자와 의사 모두 환자id를 가지며 '관계'를 가지게 됨
+
+- Symbols and Notations
+  
+    ![ss](DE_img/screenshot131.png)
+    ![ss](DE_img/screenshot132.png)
+    ![ss](DE_img/screenshot133.png)
+    - 티켓마스터의 model 예시
+
+---
+
+## Primary Key & Uinque Key
+
+### Primary key
+- 테이블에 하나밖에 없는 유니크한 구별 값, 없어선 안되는 값
+
+    ![ss](DE_img/screenshot134.png)
+
+- Foreign Key, 는 다른 테이블의 키 값
+  
+    ![ss](DE_img/screenshot135.png)
+    - 다른 테이블과의 relation을 나타냄
+    
+### Unique Key
+- 또 다른 인덱싱 키, 둘다 유니크 하긴 함(중복 없음)
+- 하나의 NULL value를 가질 수 있음
+- 프라이머리 키가 아닌 유니크 한 값
+- 하나 이상의 unique key, combination 가능 (이름 + 핸드폰번호)
+  
+    ![ss](DE_img/screenshot136.png)
+
+    
+    

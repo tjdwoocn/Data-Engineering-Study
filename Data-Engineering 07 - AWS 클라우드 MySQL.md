@@ -29,3 +29,63 @@
     ![ss](./DE_img/screenshot113.png)
     ![ss](./DE_img/screenshot114.png)
     ![ss](./DE_img/screenshot115.png)
+
+---
+
+## RDBMS - MySQL WorkBench로 접속
+> 위에서 만든 데이터베이스를 MySQL 워크벤치를 통해서 연결해보겠음
+
+### 데이터베이스 연결
+- 우선 기존에 만든 MySQL DB의 퍼블릭 엑세스 가능성이 Yes로 되야함
+
+    ![ss](./DE_img/screenshot116.png)
+  
+- 수정을 눌러 정보변경창으로 들어간 뒤 네트워크 및 보안으로 가서 Yes로 수정
+  
+    ![ss](./DE_img/screenshot117.png)
+
+- 보안정보 추가해주기(VPC security groups)
+  
+    ![ss](./DE_img/screenshot118.png)
+    ![ss](./DE_img/screenshot119.png)
+    - 인바운드 규칙 추가, 어떤 프로토콜을 통해 DB에 접근할떄 허용할것이냐
+  
+- [MySQL WorkBench](https://www.mysql.com/products/workbench/)에 접속하여 Community 버전 설치
+
+    ![ss](./DE_img/screenshot120.png)
+
+- AWS로 설치한 MySQL 서버 정보 입력 후 접속
+    ![ss](./DE_img/screenshot121.png)
+    - 플러스를 눌러 새로운 DB서버 추가해주기 
+
+    ![ss](./DE_img/screenshot122.png)
+    ![ss](./DE_img/screenshot123.png)
+    - Hostname에는 endpoint 정보 입력, port 정보도 입력
+    - Username, Password 에는 본인 정보 입력
+    - Default Schema는 블랭크로 남겨둬도 됨
+   
+    ![ss](./DE_img/screenshot124.png)
+    - 접속 완료!
+
+### 새 스키마, 테이블 생성
+- DB에 접속 했으면 DB의 새로운 스키마를 생성해줘야 함
+  
+    ![ss](./DE_img/screenshot125.png)
+    - 왼쪽 상단의 'creates new schema' 버튼을 눌러 생성하기
+    - 스키마의 이름은 임의로 'production' 이라고 정함
+    - 아래 'Apply' 버튼 클릭, 쭉쭉 누르다 'Finish'
+
+    ![ss](./DE_img/screenshot126.png)
+    - 스키마 생성완료
+
+    ![ss](./DE_img/screenshot127.png)
+    - 스키마 더블 클릭 후 Table 탭이 보이면 우클릭하여 'Create Table' 클릭
+    - Table Name 입력 ('artist genres'라고 정함), table 컬럼들 입력 후 Apply
+  
+    ![ss](./DE_img/screenshot128.png)
+    - 테이블 생성 완료
+    - 쿼리문으로 'show tables;' 입력후 ctrl + enter 하면 방금 만든 테이블이 검색됨!
+
+
+
+    
