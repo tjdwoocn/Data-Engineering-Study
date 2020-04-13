@@ -8,7 +8,7 @@
 ### RDS
 - [AWS](https://us-east-2.console.aws.amazon.com/console/home?region=us-east-2#) 페이지에서 서비스 부분을 보면 데이터베이스 부분에 RDS를 확인할 수 있음
 
-    ![ss]()../DE_img/screenshot109.png)
+    ![ss](./DE_img/screenshot109.png)
 
 ### Database 생성
 1. 데이터베이스 탭에서 데이터베이스 생성
@@ -23,9 +23,9 @@
 10. VPC: 가상환경 구축, 해당 VPC로만 접근 가능 (Security 관련)
 11. DB 생성완료 (생성 직후에는 status에 생성중이라고 뜨고 잠시 후 사용가능이라고 뜰것임)
 
-    ![ss]()../DE_img/screenshot110.png)
-    ![ss]()../DE_img/screenshot111.png)
-    ![ss]()../DE_img/screenshot112.png)
-    ![ss]()../DE_img/screenshot113.png)
-    ![ss]()../DE_img/screenshot114.png)
-    ![ss]()../DE_img/screenshot115.png)
+    ![ss](./DE_img/screenshot110.png)
+    ![ss](./DE_img/screenshot111.png)
+    ![ss](./DE_img/screenshot112.png)
+    ![ss](./DE_img/screenshot113.png)
+    ![ss](./DE_img/screenshot114.png)
+    ![ss](./DE_img/screenshot115.png)
