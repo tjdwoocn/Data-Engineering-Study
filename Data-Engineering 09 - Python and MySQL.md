@@ -149,4 +149,13 @@
     - 그러나! 처리과정이 비 효율적임, 프라이머리키 AUTO_INCREMENT 사용시 문제
       - 기존 데이터를 덮어씌우는게 아니라 지웠다가 다시 채워넣는 방식임 (대용량 데이터 처리시 비효율)
       - 기존에 AUTO_INCREMENT로 생성된 ID=1 의 아티스트가 추후에 업데이트 될때 ID=1000 의 번호를 가지고 재생성 될 수 있음
+
   
+### INSERT INTO ~ ON DUPLICATE 
+- REPLACE와 다르게 지우는 과정 없음
+- 어떠한 키값을 가지고 다양한 테이블 정보들을 (자주) 업데이트 해줘야 할 때 (artist의 popularity, follower 수치들은 지속적으로 변함)
+- 수정 작업시 해당 명령어를 가장 많이 쓴다고 함
+
+    ```linux
+        INSERT INTO artist_genres (artist_id, country) VALUES ('1234', 'rock', 'FR') ON DUPLICATE KEY UPDATE artist_id='1234', genre='rock', country='FR';
+    ```

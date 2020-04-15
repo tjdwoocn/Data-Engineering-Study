@@ -32,11 +32,9 @@ def main():
         logging.error('Could not connect to RDS')
         sys.exit(1)
 
-    cursor.execute('SHOW TABLES')
-    print(cursor.fetchall())
 
     print('connect')
-    sys.exit(0)
+
 
     headers = get_headers(client_id, client_secret)
 
@@ -44,7 +42,7 @@ def main():
     params = {
         "q": "BTS",
         "type": "artist",
-        "limit": "5", 
+        "limit": "1", 
     }
 
     # r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
@@ -74,8 +72,55 @@ def main():
     #         sys.exit(1)
 
     # Get BTS' Albums, BTS ID 값 넣어줘서 찾기
-    r = requests.get("https://api.spotify.com/v1/artists/3Nrfpe0tUJi4K4DXYWgMUX/albums", headers=headers)
+    # r = requests.get("https://api.spotify.com/v1/artists/3Nrfpe0tUJi4K4DXYWgMUX/albums", headers=headers)
     
+    r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
+    raw = json.loads(r.text)
+    print(raw['artists'].keys())
+
+    print(raw['artists']['items'][0].keys())
+
+    artist_raw = raw['artists']['items'][0]
+
+    # 가수의 정보가 BTS가 맞다면
+    if artist_raw['name'] == params['q']:
+        artist = {
+                'id': artist_raw['id'],
+                'name': artist_raw['name'],
+                'followers': artist_raw['followers']['total'],
+                'popularity': artist_raw['popularity'],
+                'url': artist_raw['external_urls']['spotify'],
+                'image_url': artist_raw['images'][0]['url'],
+        }
+
+        query = """
+            INSERT INTO artists (id, name, followers, popularity, url, image_url) 
+            VALUES ('{}', '{}', {}, {}, '{}', '{}')
+            ON DUPLICATE KEY UPDATE id='{}', name='{}', followers={}, polularity={}, url='{}', image_url='{}'
+        """.format(
+            artist['id'], 
+            artist['name'], 
+            artist['followers'], 
+            artist['popularity'], 
+            artist['url'],
+            artist['image_url'],
+            artist['id'], 
+            artist['name'], 
+            artist['followers'], 
+            artist['popularity'], 
+            artist['url'],
+            artist['image_url'],
+        )
+
+    print(query)
+    cursor.execute(query)
+    conn.commit()
+
+    sys.exit(0)
+
+
+
+
     raw = json.loads(r.text)
 
     total = raw['total']
