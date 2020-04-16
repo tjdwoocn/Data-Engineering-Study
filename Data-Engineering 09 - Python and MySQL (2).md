@@ -80,7 +80,7 @@
     ```
     ![ss](DE_img/screenshot155.png)
 
-- Query
+- Query & Save them on DB
 
     ```python
         artist_raw = raw['artists']['items'][0]
@@ -117,7 +117,70 @@
                 )
         # 쿼리내용 확인
         print(query)
+        # 쿼리 실행 및 커밋
+        cursor.execute(query)
+        conn.commit()
     ```
     
     ![ss](DE_img/screenshot156.png)
-    - 쿼리문 확인
+    ![ss](DE_img/screenshot157.png)
+    - 쿼리문 확인, DB 입력 확인
+
+- 해당 쿼리를 계속해서 날리더라도 중복때문에 문제 생기지 않고,
+  - 중복된 값은 그대로 두고 변화된 값으로만 계속 업데이트 시킬것임
+
+---
+### 쿼리 줄이기
+- 위에서 짠 코드는...너무 길었음, 반복적인게 너무 많아 최대한 줄여보려고 함
+
+    ```python
+        def insert_row(cursor, data, table):
+
+            columns = ', '.join(data.keys())
+            print(columns)
+            print()
+            placeholders = ', '.join(['%s'] * len(data))
+            print(placeholders)
+            print()
+            key_placeholders = ', '.join(['{0}=%s'.format(k) for k in data.keys()])
+            print(key_placeholders)
+            print()
+            sql = "INSERT INTO %s ( %s ) VALUES ( %s ) ON DUPLICATE KEY UPDATE %s" % (table, columns, placeholders, key_placeholders)
+            print(sql)
+            sys.exit(0)
+
+        insert_row(cursor, artist, 'artists')
+        sys.exit(0)
+    ```
+
+    ![ss](DE_img/screenshot158.png)
+    - insert_row 함수 실행결과
+    - artist 테이블(update 해준)의 key값들 먼저 나오고
+    - VALUES에 넣어줄 %s 6개 나오고
+    - DUPLICATE KEY UPDATE 뒤에 넣어줄 id=%s ~~ 등 나오고
+    - 실제 쿼리문 출력됨
+  
+- %s 부분을 채워줘야함! (기존 코드의 sql 변수 생성 밑에 추가)
+    ```python
+        sql = "INSERT INTO %s ( %s ) VALUES ( %s ) ON DUPLICATE KEY UPDATE %s" % (table, columns, placeholders, key_placeholders)
+        # data.values 를 하면 key값 제외하고 값들만 나옴
+        cursor.execute(sql, list(data.values())*2) 
+        # 리스트가 ['id값', '아티스트이름'~~] 식으로 만들어짐
+        # 이런 리스트를 *2 하여 두번쨰 %s 부분도 채워줌
+    ```
+
+- conn.commit() 으로 정상작동 되는지 확인하면 끝!!
+
+---
+
+- cursor.execute() 추가 설명
+  
+    ![ss](DE_img/screenshot159.png)
+    ![ss](DE_img/screenshot160.png)
+
+
+  
+
+
+
+    
