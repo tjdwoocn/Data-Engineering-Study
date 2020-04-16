@@ -178,9 +178,3 @@
     ![ss](DE_img/screenshot159.png)
     ![ss](DE_img/screenshot160.png)
 
-
-  
-
-
-
-    

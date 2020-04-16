@@ -4,6 +4,7 @@ import base64  # 나의 client id 와 secret key 를 base64 형태로 인코딩�
 import json
 import logging
 import pymysql
+import csv
 
 client_id = "ab567c2671e34f2ebf5e6acbcb6db44f"
 client_secret = "ef7ee3b5900c40048bc142e88f112562"
@@ -38,66 +39,50 @@ def main():
 
     headers = get_headers(client_id, client_secret)
 
+    # 아티스트 리스트 불러오기
+    artists = []
+    with open('../artist_list.csv', encoding='utf8') as f:
+        raw = csv.reader(f)
+        for row in raw:
+            artists.append(row[0])
+    print(len(artists))
+
     # Spotify Search API
-    params = {
-        "q": "BTS",
-        "type": "artist",
-        "limit": "1", 
-    }
+    for a in artists:
+        params = {
+            "q": a,
+            "type": "artist",
+            "limit": "1", 
+        }
     
-    r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
-    raw = json.loads(r.text)
-    print(raw['artists'].keys())
-
-    print(raw['artists']['items'][0].keys())
-
-    artist_raw = raw['artists']['items'][0]
-
-    artist = {}
-
-    # 가수의 정보가 BTS가 맞다면
-    if artist_raw['name'] == params['q']:
-        artist.update(
-            {
-                'id': artist_raw['id'],
-                'name': artist_raw['name'],
-                'followers': artist_raw['followers']['total'],
-                'popularity': artist_raw['popularity'],
-                'url': artist_raw['external_urls']['spotify'],
-                'image_url': artist_raw['images'][0]['url'],
-            }
-        )
-
-    insert_row(cursor, artist, 'artists')
-    conn.commit()
-
-    sys.exit(0)
-
-
-    raw = json.loads(r.text)
-
-    total = raw['total']
-    offset = raw['offset']
-    limit = raw['limit']
-    next = raw['next']
-
-    albums = []
-    albums.extend(raw['items'])
-
-    # 최대 100개만 뽑아 오겠다
-    count = 0
-    while count < 100 and next:
-        r = requests.get(raw['next'], headers=headers)
+        r = requests.get("https://api.spotify.com/v1/search", params = params, headers=headers)
         raw = json.loads(r.text)
-        next = raw['next']
-        print(next)
 
-        albums.extend(raw['items'])
-        count = len(albums)
+        artist = {}
 
-    print(len(albums))
+        # 아티스트에 대한 정보가 없는 경우 대비
+        try: 
+            artist_raw = raw['artists']['items'][0]
+            if artist_raw['name'] == params['q']:
+                artist.update(
+                    {
+                        'id': artist_raw['id'],
+                        'name': artist_raw['name'],
+                        'followers': artist_raw['followers']['total'],
+                        'popularity': artist_raw['popularity'],
+                        'url': artist_raw['external_urls']['spotify'],
+                        'image_url': artist_raw['images'][0]['url'],
+                    }
+                )
+            insert_row(cursor, artist, 'artists')
 
-
+        except:
+            logging.error('NO ITEMS FROM SEARCH API')
+            print(artist_raw['name'])
+            continue
+    
+    conn.commit()
+    sys.exit(0)
 
 
 def get_headers(clinet_id, client_secret):
@@ -128,19 +113,10 @@ def get_headers(clinet_id, client_secret):
 def insert_row(cursor, data, table):
 
     columns = ', '.join(data.keys())
-    print(columns)
-    print()
     placeholders = ', '.join(['%s'] * len(data))
-    print(placeholders)
-    print()
     key_placeholders = ', '.join(['{0}=%s'.format(k) for k in data.keys()])
-    print(key_placeholders)
-    print()
     sql = "INSERT INTO %s ( %s ) VALUES ( %s ) ON DUPLICATE KEY UPDATE %s" % (table, columns, placeholders, key_placeholders)
-    print(sql)
     cursor.execute(sql, list(data.values())*2)  
-    sys.exit(0)
-
 
 if __name__ == '__main__':
     main()
