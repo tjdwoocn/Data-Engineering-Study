@@ -48,6 +48,8 @@ def main():
     # 50개씩 묶기
     artist_batch = [artists[i: i+50] for i in range(0, len(artists), 50)]
 
+    artist_genres = []
+
     for i in artist_batch:
         # ids =  1234,2345,3456 이런식으로 , 로 붙이기 (string)
         ids = ','.join(i)
@@ -56,7 +58,21 @@ def main():
         r= requests.get(URL, headers=headers)
         raw = json.loads(r.text)
 
-    sys.exit(0)
+        for artist in raw['artists']:
+            for genre in artist['genres']:
+                artist_genres.append(
+                    {
+                        'artist_id': artist['id'],
+                        'genre': genre                    }
+                )
+
+    for data in artist_genres:
+        print(data)
+        insert_row(cursor, data, 'artist_genres')
+        
+        conn.commit()
+        sys.exit(0)
+
 
 
 def get_headers(clinet_id, client_secret):
