@@ -1,11 +1,11 @@
-# Data-Engineering 09 - Python and MySQL
+# Data-Engineering 09 - Python and MySQL (3)
 
 ## Artists List
 > 이전까진 한 가수(BTS)의 데이터만 받아 왔다면 이번에는 약 500팀의 데이터를 받아와 보겠음
 
 ### Artists List 불러오기
 - 아티스트들의 이름만 넣어둔 csv 파일 생성
-- 해당 csv 파일 불러오기
+- 해당 csv 파일 불러오기 
   
     ```python
         # 불러온 아티스트 이름 넣어줄 빈 리스트 생성
@@ -107,3 +107,59 @@
 ---
 
 ## Batch 형식
+> 기존에는 Artist 한명 한명(single) 검색을 했으면, Batch 형식은 여러 Artist를 묶어서(multi) 검색하는 것
+
+> 모든 API가 해당 기능을 제공하는것은 아님, 스포티파이는 Get Several Artist 라고 따로 기능 존재
+
+### Get Several Artist
+- [Search API]('https://developer.spotify.com/documentation/web-api/reference/artists/get-several-artists/)에서 확인 가능
+- Max 50개의 아이디를 한번에 검색 가능!!
+  
+    ![ss](DE_img/screenshot165.png)
+
+- 'spotify_api_3.py' 파일
+    ```python
+        # Batch
+        cursor.execute("SELECT id FROM artists")
+        artists = []
+        for (id, ) in cursor.fetchall():
+            artists.append(id)
+
+        # artists 테이블의 i 부터 i+50까지인데 , 첫째부터 아티스트 테이블의 끝까지, 50씩 끊어서 저장
+        artist_batch = [artists[i: i+50] for i in range(0, len(artists), 50)]
+        print(artist_batch)
+        
+        sys.exit(0)
+    ```
+    ![ss](DE_img/screenshot166.png)
+    - 50개 쯤에서 리스트가 끊기고 다시 시작
+
+- 50개씩 묶기
+    ```python
+        # 50개씩 묶기
+        artist_batch = [artists[i: i+50] for i in range(0, len(artists), 50)]
+        
+        # id가 50개씩 들어가있는 리스트, 반복
+        for i in artist_batch:
+            # ids =  1234,2345,3456 이런식으로 , 로 붙이기 (string)
+            ids = ','.join(i)
+            URL = "https://api.spotify.com/v1/artists/?ids={}".format(ids)
+
+            r= requests.get(URL, headers=headers)
+            raw = json.loads(r.text)
+            print(raw)
+            print(len(raw['artists']))
+            # 한번만 실행해봄
+            sys.exit(0)
+
+    ```
+    ![ss](DE_img/screenshot167.png)
+    - 한번 실행했는데 50개의 ids 호출
+
+  
+
+
+
+
+
+    
