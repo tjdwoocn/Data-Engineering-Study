@@ -67,11 +67,10 @@ def main():
                 )
 
     for data in artist_genres:
-        print(data)
         insert_row(cursor, data, 'artist_genres')
         
-        conn.commit()
-        sys.exit(0)
+    conn.commit()
+    sys.exit(0)
 
 
 
