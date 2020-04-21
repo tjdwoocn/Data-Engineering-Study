@@ -165,5 +165,73 @@
     ![ss](DE_img/screenshot194.png)
 
 - 현재 약 5~600개의 artist_id가 있는데 이정도는 put_item()으로 해도 크게 느리지 않음
+- 모두 다 삽입 하는데 약 5~10분정도 걸렸음
 
+---
 
+## DynamoDB 데이터 요청 및 제한점
+> 위에서 저장시킨 데이터를 DynamoDB로 부터 가져와보겠음
+
+### Getting an Item
+- boto3 reference 페이지 에서 확인가능
+
+    ![ss](DE_img/screenshot195.png)
+
+- 코드 작성
+
+    ```python
+        def main():
+
+            try:
+                dynamodb = boto3.resource('dynamodb', 
+                                        region_name='ap-northeast-2', 
+                                        endpoint_url='http://dynamodb.ap-northeast-2.amazonaws.com')
+            except:
+                logging.error('could not connect to dynamodb')
+                sys.exit(1)
+
+            print('Success')
+
+            table = dynamodb.Table('top_tracks')
+            # key 값으로는 우리가 설정한 모든 key값이 있어야만 사용가능
+            # primary/sort/index
+            response = table.get_item(
+                Key={
+                    'artist_id': '7hJcb9fa4alzcOq3EaNPoG',
+                    'id': '6YbhspuOar1D9WSSnfe7ds'
+                }
+            )
+            print(response)
+
+    ```
+
+        ![ss](DE_img/screenshot196.png)
+
+--- 
+
+### Querying and Scanning
+- get_item은 사용하려면 모든 키값을 다 알아야 함
+  - 그러나 모든 데이터의 키값들을 다 알 수 가 없음, 이때 사용
+
+    ![ss](DE_img/screenshot197.png)
+
+- Querying: Primary Key 값을 알 때 사용
+
+    ```python
+        from boto3.dynamodb.conditions import Key, Attr # Querying와 Scanning을 쓰기 위해 필요
+
+        # Querying
+        response = table.query(
+            KeyConditionExpression = Key('artist_id').eq('0L8ExT028jH3ddEcZwqJJ5'),
+            FilterExpression = Attr('popularity').gt(80)
+        )
+        print(response['Items'])
+    ```
+    - eq = equal, gt = greater than, lt = less than, 여러 필터추가 가능
+
+    ![ss](DE_img/screenshot198.png)
+    - popularity가 80 이상인 트랙만
+
+- Scanning: 키값은 모르지만 다른 어트리뷰트 값들을 알 때 사용
+    - 위 코드에서 KeyConditionExpression을 빼고, FilterExpression만 사용해서 검색
+    - 데이터 테이블 자체가 큰 상황에서 스캐닝 사용시 과부하 가능성 있음

@@ -52,7 +52,7 @@ def main():
     table = dynamodb.Table('top_tracks')
 
     # artist_id 가져오기
-    cursor.execute('SELECT id FROM artists LIMIT 1')
+    cursor.execute('SELECT id FROM artists')
 
     # 각 artist_id별 Top-Tracks 정보 접근
     for (artist_id, ) in cursor.fetchall():
@@ -70,7 +70,7 @@ def main():
             data ={
                 'artist_id': artist_id,
             }
-
+            print(artist_id)
             data.update(track)
 
             # dynamodb table에 put_item 함수를 사용해서 데이터 삽입
