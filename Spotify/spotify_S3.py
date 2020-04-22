@@ -59,7 +59,8 @@ def main():
     s3 = boto3.resource('s3')
     # 버켓 불러오기
     object = s3.Object('artist-spotift', 'dt={}/top-tracks.json',format(dt))
-
+    data = open('top-tracks.json', 'rb')
+    object.put(Body=data)
 
 
 def get_headers(clinet_id, client_secret):
