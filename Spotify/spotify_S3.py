@@ -1,12 +1,12 @@
-import os
 import sys
+import os
+import logging
 import boto3
 import requests
-import base64  # 나의 client id 와 secret key 를 base64 형태로 인코딩해주는 패키지
-import json
-import logging
+import base64
 import pymysql
-import csv
+import json
+from datetime import datetime
 
 client_id = "ab567c2671e34f2ebf5e6acbcb6db44f"
 client_secret = "ef7ee3b5900c40048bc142e88f112562"
@@ -15,23 +15,13 @@ host = 'data-engineering.c9ck0xgcwbcx.us-east-2.rds.amazonaws.com'
 port = 3306
 username = 'SJ'
 database = 'production'
-password = ''
+password = 'qhrtns12'
 
 
 def main():
 
     try:
-        dynamodb = boto3.resource('dynamodb', 
-                                region_name='ap-northeast-2', 
-                                endpoint_url='http://dynamodb.ap-northeast-2.amazonaws.com')
-    except:
-        logging.error('could not connect to dynamodb')
-        sys.exit(1)
-    
-    print('Success')
-
-    try:
-        # 커넥트
+        # MySQL 커넥트
         conn = pymysql.connect(host, 
                                 user=username,
                                 passwd=password, 
@@ -43,40 +33,34 @@ def main():
 
     except:
         logging.error('Could not connect to RDS')
+        sys.exit(1)
 
-    print('Connect')
+    print('connect')
 
     headers = get_headers(client_id, client_secret)
 
-    # dynamodb 테이블 불러오기
-    table = dynamodb.Table('top_tracks')
-
-    # artist_id 가져오기
+    # RDS(MySQL) - 아티스트 ID 를 가져오고
     cursor.execute('SELECT id FROM artists')
 
-    # 각 artist_id별 Top-Tracks 정보 접근
-    for (artist_id, ) in cursor.fetchall():
-        URL = 'https://api.spotify.com/v1/artists/{}/top-tracks'.format(artist_id)
-        params = {
-            'country': 'US'
-        }
+    # unixtime 
+    dt = datetime.utcnow().strftime('%Y-%m-%d')
 
-        # 정보 호출
-        r = requests.get(URL, params=params, headers=headers)
-        # raw에 json 형태로 저장
-        raw = json.loads(r.text)
-        # tracks에 있는 정보들 추출
-        for track in raw['tracks']:
-            data ={
-                'artist_id': artist_id,
-            }
-            print(artist_id)
-            data.update(track)
+    for (id, ) in cursor.fetchall():
 
-            # dynamodb table에 put_item 함수를 사용해서 데이터 삽입
-            table.put_item(
-                Item=data
-            )
+        # Spotify API를 통해서 데이터를 불러오고
+
+    # .json 타입으로 저장
+    with open('top_tracks.json', 'w') as f:
+        for i in top_tracks:
+            json.dump(i ,f)
+            f.write(os.linesep)
+
+    # S3에 import
+    s3 = boto3.resource('s3')
+    # 버켓 불러오기
+    object = s3.Object('artist-spotift', 'dt={}/top-tracks.json',format(dt))
+
+
 
 def get_headers(clinet_id, client_secret):
     
@@ -102,6 +86,6 @@ def get_headers(clinet_id, client_secret):
     
     return headers 
 
-if __name__ == '__main__':
-    main()
 
+def if __name__ == "__main__":
+    main()

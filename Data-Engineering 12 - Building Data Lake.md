@@ -28,4 +28,36 @@
 
 ---
 
-## 
+## S3 in Python
+> 파이썬으로 S3를 다뤄보겠음
+
+### 연동
+
+    ```python
+        # RDS(MySQL) - 아티스트 ID 를 가져오고
+        cursor.execute('SELECT id FROM artists')
+
+        # unixtime , 파티션 파악을 위해 시간값을 넣어줘야함
+        dt = datetime.utcnow().strftime('%Y-%m-%d')
+
+        # Spotify API를 통해서 데이터를 불러오고
+
+
+        # .json 타입으로 저장, list of dictionary
+        # top_tracks.json이라는 파일이 생기고 거기서 부터 딕셔너리가 한줄한줄 쭉 들어감
+        with open('top_tracks.json', 'w') as f:
+            for i in top_tracks:
+                json.dump(i ,f)
+                f.write(os.linesep)
+
+        # 위에서 만든 json 전체를 S3로 inport
+        s3 = boto3.resource('s3')
+
+        # 버켓 불러오기
+        # readable한 dt(datetime) 파티션을 만들어놔야함(특히 지속적으로 업데이트 되는 데이터들)
+        object = s3.Object('artist-spotift', 'dt={}/top-tracks.json',format(dt))
+
+    ```
+---
+
+###  
