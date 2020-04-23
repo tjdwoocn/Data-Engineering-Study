@@ -85,7 +85,8 @@
         # S3에 import
         s3 = boto3.resource('s3')
         # 버켓 불러오기 (기존의 json이 아닌 parquet으로)
-        object = s3.Object('artist-spotift', 'dt={}/top-tracks.parquet',format(dt))
+        # top-tracks라는 폴더 생성, 추후에 audio-features 도 따로 폴더 만들예정
+        object = s3.Object('artist-spotift', 'top-tracks/dt={}/top-tracks.parquet'.format(dt))
         data = open('top-tracks.parquet', 'rb')
         object.put(Body=data)
     ```
@@ -162,3 +163,44 @@
 
     ![ss](DE_img2/screenshot12.png)
     ![ss](DE_img2/screenshot13.png)
+
+- 기본적으로 top-tracks 데이터 가져오는것과 유사
+  
+    ```python
+        # audio features
+        audio_features = []
+
+        # batch 형식 가능, 100개까지
+        tracks_batch = [track_ids[i: i+100] for i in range(0, len(track_ids), 100)]
+
+        for i in tracks_batch:
+            ids = ','.join(i)
+            URL = 'https://api.spotify.com/v1/audio-features/?ids={}'.format(ids)
+
+            r = requests.get(URL, headers=headers)
+            raw = json.loads(r.text)
+
+            audio_features.extend(raw['audio_features'])
+
+        audio_features = pd.DataFrame(audio_features)
+        audio_features.to_parquet('audio-features.parquet', engine='pyarrow', compression='snappy')
+        print(audio_features)
+
+        # S3에 import
+        s3 = boto3.resource('s3')
+
+        # audio-featuers라는 폴더를 따로 생성
+        object = s3.Object('artist-spotify', 'audio-features/dt={}/audio-features.parquet'.format(dt))
+        data = open('audio-features.parquet', 'rb')
+        object.put(Body=data)
+    ```
+
+    ![ss](DE_img2/screenshot14.png)
+    ![ss](DE_img2/screenshot15.png)
+    ![ss](DE_img2/screenshot16.png)
+    - 위와같이 각 항목마다 폴더, dt, parquet 을 추가로 생성할 예정
+    - 굳이 이런식으로 나눌 필요는 없지만, 예를들어 어제의 탑트랙과 오늘의 탑트랙이 다를수 있고, 나는 어느 일정한 날의 탑트랙을 보려고 한다 면 이렇게 나누는것이 추후 더 용이하다고 판단
+
+
+
+

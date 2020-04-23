@@ -17,7 +17,7 @@ host = 'data-engineering.c9ck0xgcwbcx.us-east-2.rds.amazonaws.com'
 port = 3306
 username = 'SJ'
 database = 'production'
-password = ''
+password = 'qhrtns12'
 
 
 def main():
@@ -43,7 +43,7 @@ def main():
     headers = get_headers(client_id, client_secret)
 
     # RDS(MySQL) - 아티스트 ID 를 가져오고
-    cursor.execute('SELECT id FROM artists LIMIT 10')
+    cursor.execute('SELECT id FROM artists')
 
     # jsonpath 패키지를 통해, 해당 path안에서 데이터를 가져올때,
     # 지정된 키를 참고하여 좀 더 빠르고 쉽게 가져옴
@@ -73,9 +73,12 @@ def main():
                 top_track.update({'artist_id': id})
                 top_tracks.append(top_track)
         
+    # track_ids, top_tracks안의 id값만 가져오기
+    track_ids = [i['id'][0] for i in top_tracks]
+
     # List of dictionaries, Parquet화
     top_tracks = pd.DataFrame(top_tracks)
-    top_tracks.to_parquet('top_tracks.parquet', engine='pyarrow', compression='snappy')
+    top_tracks.to_parquet('top-tracks.parquet', engine='pyarrow', compression='snappy')
 
    # unixtime 
     dt = datetime.utcnow().strftime('%Y-%m-%d')
@@ -84,15 +87,14 @@ def main():
     s3 = boto3.resource('s3')
 
     # 버켓 불러오기 (기존의 json이 아닌 parquet으로)
-    object = s3.Object('artist-spotift', 'dt={}/top-tracks.parquet',format(dt))
+    object = s3.Object('artist-spotify', 'top-tracks/dt={}/top-tracks.parquet'.format(dt))
     data = open('top-tracks.parquet', 'rb')
     object.put(Body=data)
 
     # audio features
-    audio_features = 
+    audio_features = []
 
-    # track_ids, top_tracks안의 id값만 가져오기
-    track_ids = [i['id'][0] for i in top_tracks]
+    # batch 형식 가능, 100개까지
     tracks_batch = [track_ids[i: i+100] for i in range(0, len(track_ids), 100)]
 
     for i in tracks_batch:
@@ -101,6 +103,21 @@ def main():
 
         r = requests.get(URL, headers=headers)
         raw = json.loads(r.text)
+
+        audio_features.extend(raw['audio_features'])
+
+    audio_features = pd.DataFrame(audio_features)
+    audio_features.to_parquet('audio-features.parquet', engine='pyarrow', compression='snappy')
+    print(audio_features)
+
+    # S3에 import
+    s3 = boto3.resource('s3')
+
+    # 버켓 불러오기 (기존의 json이 아닌 parquet으로)
+    object = s3.Object('artist-spotify', 'audio-features/dt={}/audio-features.parquet'.format(dt))
+    data = open('audio-features.parquet', 'rb')
+    object.put(Body=data)
+
 
 def get_headers(clinet_id, client_secret):
     
