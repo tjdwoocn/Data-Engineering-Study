@@ -93,4 +93,19 @@
     - top_tracks와 동일한 방법으로, 항목만 다르게 생성
 
 
+### Presto Functions
+- [Presto Functions](https://prestodb.io/docs/current/functions.html) 페이지에서 다양한 함수들 확인 가능
+
+    ![ss](DE_img2/screenshot26.png)
+    ![ss](DE_img2/screenshot27.png)
+
+- 쿼리실행 (기존의 SQL과 매우 유사)
+
+    ![ss](DE_img2/screenshot28.png)
+    - 현재는 데이터베이스에 데이터가 많이 없지만 추후에 쌓일것을 대비해
+    - 마지막 부분에 dt (partition) 부분을 넣어서 검색하는것을 권장
+
+- AWS 생태계에서 데이터 분석, 시각화 등을 진행할때 매우 유용하게 쓰이는 Athena에 대해 알아보았음
+
+
 
