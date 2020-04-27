@@ -17,7 +17,7 @@ host = 'data-engineering.c9ck0xgcwbcx.us-east-2.rds.amazonaws.com'
 port = 3306
 username = 'SJ'
 database = 'production'
-password = 'qhrtns12'
+password = ''
 
 
 def main():
