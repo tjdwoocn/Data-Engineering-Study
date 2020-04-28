@@ -28,11 +28,11 @@
 
 ---
 
-## AWS EC2 Zeplin
->df
+## AWS EC2, Apache Zeppelin
+> 
 
-### Zepline, Spark 설치하기
-- AWS의 EMR(Elastic Map Reduce)이라는 서비스를 통해 Zepline과 Spark를 설치해보겠음
+### Zeppelin, Spark 설치하기
+- AWS의 EMR(Elastic Map Reduce)이라는 서비스를 통해 Zeppelin과 Spark를 설치해보겠음
   - EMR: 스파크, 하둡 시스템의 클러스터를 만들어주는 곳
   - 클러스터: 서버, EC2 등의 가상서버 등
 
@@ -74,6 +74,6 @@
     - 윈도우의 경우 해당부분 참고하여 진행
     - 내용이 길어져서 이부분은 정리하지 않음
   
-  
+
   -  
 
