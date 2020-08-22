@@ -90,3 +90,8 @@ def get_headers(clinet_id, client_secret):
 
 def if __name__ == "__main__":
     main()
+
+a=5
+b=4
+for i in range(int(input())):
+    print(eval('+'.join(input().split())))

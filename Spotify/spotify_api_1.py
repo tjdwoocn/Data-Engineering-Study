@@ -191,3 +191,4 @@ def insert_row(cursor, data, time):
 
 if __name__ == '__main__':
     main()
+
